@@ -114,13 +114,13 @@
 </template>
 
 <script setup>
-import { reactive, onMounted } from 'vue'
+import { reactive, onMounted, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getContactById, updateContact } from '../utils/storage'
 
 const router = useRouter()
 const route = useRoute()
-let contact = null
+const contact = ref(null)
 
 const form = reactive({
   firstName: '',
@@ -136,17 +136,20 @@ const form = reactive({
 
 onMounted(() => {
   const id = route.params.id
-  contact = getContactById(id)
+  const foundContact = getContactById(id)
   
-  if (contact) {
-    Object.assign(form, contact)
+  if (foundContact) {
+    contact.value = foundContact
+    Object.assign(form, foundContact)
   }
 })
 
 function submitForm() {
   const id = route.params.id
-  updateContact(id, form)
-  router.push(`/contact/${id}`)
+  const result = updateContact(id, form)
+  if (result) {
+    router.push(`/contact/${id}`)
+  }
 }
 </script>
 

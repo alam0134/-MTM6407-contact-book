@@ -64,7 +64,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getContactById, deleteContact } from '../utils/storage'
 
@@ -72,9 +72,18 @@ const router = useRouter()
 const route = useRoute()
 const contact = ref(null)
 
-onMounted(() => {
+const loadContact = () => {
   const id = route.params.id
   contact.value = getContactById(id)
+}
+
+onMounted(() => {
+  loadContact()
+})
+
+// Watch for route changes to reload contact when returning from edit
+watch(() => route.params.id, () => {
+  loadContact()
 })
 
 function getInitials(contact) {
